@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linguistic Variability in AI vs Human Text — Aditi Sahay</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--cream:#f5f0e8;--ink:#1a1714;--ink-light:#4a4540;--ink-faint:#8a8078;--rule:#c8bfb0;--accent:#8b2020;--accent-light:#c4453a;--paper:#faf7f2;--paper-dark:#ede8de}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;font-size:17px;line-height:1.75;min-height:100vh}
+.masthead{border-bottom:2px solid var(--ink);padding:1.1rem 0 0;text-align:center;position:sticky;top:0;background:var(--cream);z-index:100}
+.masthead-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.5rem}
+.nav-row{display:flex;justify-content:center;gap:0;border-top:0.5px solid var(--rule);margin-top:0.5rem;flex-wrap:wrap}
+.nav-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:7px 16px;border:none;background:transparent;color:var(--ink-faint);cursor:pointer;border-right:0.5px solid var(--rule);transition:all 0.15s}
+.nav-btn:last-child{border-right:none}
+.nav-btn:hover,.nav-btn.active{background:var(--ink);color:var(--cream)}
+.page-wrap{max-width:740px;margin:0 auto;padding:0 2rem}
+.section{display:none}
+.section.active{display:block;animation:fadein 0.22s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.paper-header{padding:3rem 0 2rem;border-bottom:1px solid var(--rule);margin-bottom:2rem}
+.paper-kicker{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+.paper-title{font-family:'IM Fell English',serif;font-size:27px;line-height:1.25;color:var(--ink);margin-bottom:1.5rem;max-width:600px}
+.paper-meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-faint);line-height:2.1}
+.paper-meta a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.keywords{display:flex;flex-wrap:wrap;gap:6px;margin-top:1rem}
+.kw{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border:0.5px solid var(--rule);color:var(--ink-faint)}
+.abstract{background:var(--paper-dark);border-left:3px solid var(--ink);padding:1.25rem 1.5rem;margin-bottom:2.5rem}
+.abstract-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:0.6rem}
+.abstract p{font-size:15px;line-height:1.7;color:var(--ink-light);font-style:italic}
+.sec-heading{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-faint);border-bottom:0.5px solid var(--rule);padding-bottom:5px;margin:2rem 0 1rem}
+.sub-heading{font-family:'IM Fell English',serif;font-style:italic;font-size:19px;color:var(--ink);margin:1.75rem 0 0.6rem}
+.body-text{font-size:16.5px;line-height:1.82;color:var(--ink-light);margin-bottom:1rem}
+cite-num{font-family:'DM Mono',monospace;font-size:10px;vertical-align:super;color:var(--accent)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1.5rem 0}
+.stat-card{background:var(--paper);padding:1.25rem 1rem;text-align:center}
+.stat-val{font-family:'IM Fell English',serif;font-size:38px;color:var(--accent);line-height:1;margin-bottom:4px}
+.stat-unit{font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-faint);letter-spacing:0.1em;text-transform:uppercase}
+.stat-desc{font-size:12.5px;color:var(--ink-faint);margin-top:5px;line-height:1.4}
+.table-wrap{overflow-x:auto;margin:1.25rem 0}
+table{width:100%;border-collapse:collapse;font-size:13px;font-family:'DM Mono',monospace}
+thead tr{border-bottom:1.5px solid var(--ink)}
+th{padding:8px 10px;text-align:left;font-weight:500;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint)}
+td{padding:8px 10px;border-bottom:0.5px solid var(--rule);color:var(--ink-light)}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--ink);font-weight:500}
+.flag-warn{color:#a03020}
+.flag-ok{color:#2a6a3a}
+.figure-wrap{border:0.5px solid var(--rule);background:var(--paper);padding:1.25rem;margin:1.75rem 0}
+.figure-wrap canvas{width:100%!important;max-height:220px}
+.figure-caption{font-size:12.5px;color:var(--ink-faint);margin-top:0.75rem;line-height:1.55;font-family:'Crimson Pro',serif;font-style:italic}
+.figure-caption strong{font-style:normal;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink)}
+.analyser-wrap{background:var(--paper);border:0.5px solid var(--rule);padding:1.5rem;margin:1.5rem 0}
+.analyser-wrap textarea{width:100%;height:120px;font-family:'DM Mono',monospace;font-size:12px;border:0.5px solid var(--rule);background:var(--cream);color:var(--ink);padding:10px 12px;resize:vertical;line-height:1.6}
+.analyser-wrap textarea:focus{outline:none;border-color:var(--ink)}
+.analyser-wrap textarea::placeholder{color:var(--ink-faint)}
+.run-btn{margin-top:10px;padding:8px 22px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;background:var(--ink);color:var(--cream);border:none;cursor:pointer;transition:background 0.15s}
+.run-btn:hover{background:var(--accent)}
+.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:0.5px solid var(--rule);margin-top:1rem}
+.res-card{background:var(--paper);padding:0.85rem 0.75rem;text-align:center}
+.res-val{font-family:'IM Fell English',serif;font-size:26px;color:var(--ink);line-height:1}
+.res-label{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-faint);margin-top:3px}
+.badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.06em;padding:2px 8px;margin-top:5px;text-transform:uppercase}
+.badge-human{background:#e8eff8;color:#1a3a6b;border:0.5px solid #7aa0dc}
+.badge-ai{background:#fdf0e3;color:#7a3a00;border:0.5px solid #dba050}
+.badge-mid{background:var(--paper-dark);color:var(--ink-faint);border:0.5px solid var(--rule)}
+.hint-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:8px;line-height:1.7}
+.code-block{background:var(--ink);color:#c8bfb0;font-family:'DM Mono',monospace;font-size:11px;line-height:1.6;padding:1.25rem 1.5rem;margin:1rem 0;overflow-x:auto;white-space:pre}
+.site-footer{border-top:1px solid var(--rule);margin-top:3rem;padding:1.5rem 0;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--ink-faint)}
+.site-footer a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:600px){.paper-title{font-size:21px}.stat-grid,.results-grid{grid-template-columns:1fr}.nav-btn{padding:6px 10px;font-size:8px}.page-wrap{padding:0 1rem}}
+.cite-wrapper {
+  position: relative;
+  display: inline;
+}
+
+.cite-popup {
+  display: none;
+  position: absolute;
+  bottom: 1.8em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  padding: 10px 14px;
+  width: 280px;
+  z-index: 999;
+  border: none;
+}
+
+.cite-wrapper:hover .cite-popup {
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-title">Computational Linguistics · Independent Research · 2025</div>
+  <nav class="nav-row">
+    <button class="nav-btn active" onclick="show('overview',this)">Overview</button>
+    <button class="nav-btn" onclick="show('introduction',this)">Introduction</button>
+    <button class="nav-btn" onclick="show('results',this)">Results</button>
+    <button class="nav-btn" onclick="show('discussion',this)">Discussion</button>
+    <button class="nav-btn" onclick="show('methods',this)">Methods</button>
+    <button class="nav-btn" onclick="show('analyser',this)">Analyser</button>
+    <button class="nav-btn" onclick="show('appendix',this)">Appendix</button>
+  </nav>
+</header>
+
+<div class="page-wrap">
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active">
+  <div class="paper-header">
+    <div class="paper-kicker">Exploratory · Quantitative · Computational Linguistics</div>
+    <h1 class="paper-title">A Comparative Analysis of Variability in AI-Generated and Human-Written Text</h1>
+    <div class="paper-meta">
+      <strong>Aditi Sahay</strong> · Little Flower School, Jamshedpur, Jharkhand, India ·
+      <a href="https://aditisahay.vercel.app" target="_blank">aditisahay.vercel.app</a><br>
+      Rimjhim Deopriya · Jamshedpur, Jharkhand, India<br>
+      n = 172 human responses · n = 150 AI-generated responses · 5 linguistic metrics
+    </div>
+    <div class="keywords">
+      <span class="kw">Artificial Intelligence</span>
+      <span class="kw">Human-AI Comparison</span>
+      <span class="kw">Statistical Text Analysis</span>
+      <span class="kw">Linguistic Variability</span>
+      <span class="kw">Computational Linguistics</span>
+    </div>
+  </div>
+
+  <div class="abstract">
+    <div class="abstract-label">Abstract</div>
+    <p>This study investigates whether AI-generated text exhibits lower linguistic variability than human-written text under identical prompt conditions. Using quantitative linguistic metrics — word count, sentence structure, and lexical diversity — the research compares 172 human responses with 150 AI-generated responses to an open-ended prompt. Findings indicate that AI-generated responses demonstrate substantially lower variance and greater structural consistency, suggesting that statistical regularisation may be an important characteristic of large language model output.</p>
+  </div>
+
+  <div class="sec-heading">Key findings</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-val">52.5×</div>
+      <div class="stat-unit">Variance ratio</div>
+      <div class="stat-desc">Word count — human responses 52× more variable in length than AI</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">20.1×</div>
+      <div class="stat-unit">Variance ratio</div>
+      <div class="stat-desc">Avg sentence length — structural spread 20× wider in humans</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">17.3×</div>
+      <div class="stat-unit">Variance ratio</div>
+      <div class="stat-desc">Type-token ratio — lexical diversity spread 17× greater in humans</div>
+    </div>
+  </div>
+
+  <p class="body-text">The strongest finding was not a difference in averages — it was a difference in <em>spread</em>. Human responses ranged from 3 to 229 words; AI responses ranged from 61 to 83 words across five models. This distributional compression, consistent across all three metrics, is the central contribution of this study.</p>
+
+  <div class="sec-heading">Summary</div>
+  <p class="body-text">Loneliness has emerged as a significant public health concern in contemporary urban environments, yet most comparative studies of human and AI-generated text rely on subjective assessments of creativity or quality rather than measurable linguistic properties. This study investigates whether AI-generated responses exhibit lower linguistic variability than human-written responses when both groups respond to an identical prompt. We hypothesized that AI-generated responses would demonstrate significantly lower distributional spread across structural and lexical linguistic metrics compared to human-written responses. To test this, 172 human responses were collected via Google Form distributed through social media and peer networks and 150 AI responses were generated by five large language models — ChatGPT, Claude, Gemini, Grok, and Perplexity — each responding to the prompt: <em>"Propose a unique solution to loneliness in modern cities."</em> Five linguistic metrics were computed for each response: word count, unique word count, type-token ratio (TTR), sentence count and average sentence length. Variance ratios, Cohen's d, Glass's delta and F-tests were employed as primary quantitative evidence. Results indicated substantially greater distributional spread in human-written responses across all three primary metrics, with variance ratios of 52.46, 20.05 and 17.26 for word count, average sentence length and type-token ratio respectively. These findings suggest that AI-generated text exhibits measurably lower linguistic variability under controlled prompt conditions, though results are interpreted as exploratory given the single-prompt design and absence of response-level inferential testing.</p>
+</div>
+
+<!-- INTRODUCTION -->
+<div id="introduction" class="section">
+  <div class="sec-heading">Introduction</div>
+  <p class="body-text">The rapid integration of large language models (LLMs) into everyday communication has raised fundamental questions about the nature of machine-generated text and how it compares to human writing across measurable linguistic dimensions.<cite-num>[1]</cite-num> LLMs such as GPT, Claude, Gemini, Grok, and Perplexity are now capable of producing fluent, coherent responses to open-ended prompts, making them increasingly indistinguishable from human-authored text in surface-level reading.<cite-num>[2]</cite-num> However, fluency and coherence are not equivalent to variability — the degree to which responses differ from one another across a population of writers or generators. Understanding whether AI-generated text is systematically more uniform than human-written text has practical implications for fields ranging from automated content detection to educational assessment and computational linguistics.<cite-num>[3]</cite-num></p>
+  <p class="body-text">Loneliness in modern urban environments has been identified as a significant and growing public health concern, affecting cognitive function, physical health, and social behaviour.<span class="cite-wrapper">
+  <cite-num>[4]</cite-num>
+  <span class="cite-popup">Holt-Lunstad, J. et al. (2015). Loneliness and social isolation as risk factors for mortality. Perspectives on Psychological Science.</span>
+</span> As AI systems are increasingly deployed in contexts intended to address social and emotional needs — including companionship applications, mental health tools, and community platforms — it becomes important to understand not only what these systems say, but how consistently and uniformly they say it relative to the diversity of human expression.<cite-num>[5]</cite-num> If AI-generated responses converge toward statistically narrow linguistic patterns, this has implications for the authenticity and representational breadth of AI communication in such contexts.</p>
+  <p class="body-text">Linguistic variability in written text can be operationalised through a range of quantitative metrics. Word count and sentence count measure structural length properties, while average sentence length captures syntactic complexity.<cite-num>[6]</cite-num> Type-token ratio (TTR), defined as the ratio of unique word types to total word tokens, provides a measure of lexical diversity within a text.<cite-num>[7]</cite-num> These metrics, drawn from computational linguistics, allow for objective comparison of textual properties without reliance on subjective judgments of quality or creativity. Prior research has applied such metrics to distinguish authorship, assess writing development, and characterise genre differences, though their systematic application to human-versus-AI comparative variability analysis remains limited.<cite-num>[8]</cite-num></p>
+  <p class="body-text">The present study applies this quantitative framework to a controlled comparative design. Human-written and AI-generated responses to an identical open-ended prompt were collected and analysed across five linguistic metrics. We hypothesized that AI-generated responses would exhibit significantly lower distributional spread — that is, lower variance — across structural and lexical metrics compared to human-written responses. Results supported this hypothesis across all primary metrics, with variance ratios ranging from 17.26 to 52.46, indicating that human responses occupied a substantially wider range of the linguistic metric space. These findings suggest that measurable distributional compression may be a consistent property of AI-generated text under controlled prompt conditions, with implications for how such text is evaluated, detected, and deployed.</p>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="section">
+  <div class="sec-heading">Results</div>
+
+  <div class="sub-heading">Descriptive Statistics and Group Distributions</div>
+  <p class="body-text">To characterise baseline differences between groups, descriptive statistics were computed for three primary linguistic metrics across 172 human-written and 150 AI-generated responses. Human-written responses exhibited a mean word count of 51.52 words (SD = 47.72), a mean average sentence length of 21.90 words (SD = 14.77), and a mean type-token ratio of 0.8398 (SD = 0.1175). AI-generated responses produced a mean word count of 77.40 words (SD = 6.59), a mean average sentence length of 19.63 words (SD = 3.27), and a mean type-token ratio of 0.8945 (SD = 0.0283). The human word count distribution exhibited a coefficient of variation of approximately 92%, suggesting considerable skew. AI responses were tightly clustered around their respective means across all metrics. Mean and standard deviation values for both groups are presented in Figure 2.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>Human mean</th><th>Human SD</th><th>AI mean</th><th>AI SD</th></tr></thead>
+      <tbody>
+        <tr><td>Word count</td><td>51.52</td><td>47.72</td><td>77.40</td><td>6.59</td></tr>
+        <tr><td>Avg sentence length</td><td>21.90</td><td>14.77</td><td>19.63</td><td>3.27</td></tr>
+        <tr><td>Type-token ratio</td><td>0.8398</td><td>0.1175</td><td>0.8945</td><td>0.0283</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="figure-wrap">
+    <canvas id="fig2"></canvas>
+    <div class="figure-caption"><strong>Figure 2.</strong> Group means with standard deviation error bars for word count, average sentence length, and type-token ratio across human-written (n = 172, blue) and AI-generated (n = 150, orange) responses. Error bar asymmetry between groups is most pronounced for word count, reflecting substantially greater distributional spread in human-written responses.</div>
+  </div>
+
+  <div class="sub-heading">Variance Analysis</div>
+  <p class="body-text">Variance ratios indicated substantially greater distributional spread in human-written responses across all three metrics. Word count exhibited the largest difference (VR = 52.46), followed by average sentence length (VR = 20.05) and type-token ratio (VR = 17.26), indicating that human responses were approximately 52, 20, and 17 times more variable than AI responses respectively (Figure 1). F-tests confirmed statistically significant variance differences for all three metrics: word count, F(171, 149) = 52.47, p &lt; .001; average sentence length, F(171, 149) = 20.39, p &lt; .001; and type-token ratio, F(171, 149) = 17.24, p &lt; .001.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>F-statistic</th><th>df₁</th><th>df₂</th><th>p-value</th><th>VR</th><th>Normality assumption</th></tr></thead>
+      <tbody>
+        <tr><td>Word count</td><td>52.47</td><td>171</td><td>149</td><td>&lt; .001</td><td><strong>52.46</strong></td><td class="flag-warn">Likely violated</td></tr>
+        <tr><td>Avg sentence length</td><td>20.39</td><td>171</td><td>149</td><td>&lt; .001</td><td><strong>20.05</strong></td><td class="flag-warn">Possibly violated</td></tr>
+        <tr><td>Type-token ratio</td><td>17.24</td><td>171</td><td>149</td><td>&lt; .001</td><td><strong>17.26</strong></td><td class="flag-ok">Plausible</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="figure-wrap">
+    <canvas id="fig1"></canvas>
+    <div class="figure-caption"><strong>Figure 1.</strong> Variance ratios (σ²_human ÷ σ²_AI) for word count, average sentence length, and type-token ratio. The dashed red line at VR = 1 represents theoretical variance equality between groups. All three metrics exhibited substantially greater variance in human-written responses (n = 172) relative to AI-generated responses (n = 150).</div>
+  </div>
+
+  <div class="sub-heading">Effect Size Analysis</div>
+  <p class="body-text">Both Cohen's d and Glass's delta were computed for each metric. Glass's delta — which uses the human group SD as denominator — was treated as the preferred measure given the substantial inequality in group standard deviations. For word count, Cohen's d = −0.76 and Glass's Δ = +0.54 (medium to medium-large). For average sentence length, Cohen's d = +0.21 and Glass's Δ = −0.15 (small). For type-token ratio, Cohen's d = −0.64 and Glass's Δ = +0.47 (medium). Effect sizes are presented in Figure 3.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>Cohen's d</th><th>Glass's Δ</th><th>Magnitude</th></tr></thead>
+      <tbody>
+        <tr><td>Word count</td><td>−0.76</td><td>+0.54</td><td>Medium–large</td></tr>
+        <tr><td>Avg sentence length</td><td>+0.21</td><td>−0.15</td><td>Small</td></tr>
+        <tr><td>Type-token ratio</td><td>−0.64</td><td>+0.47</td><td>Medium</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="figure-wrap">
+    <canvas id="fig3"></canvas>
+    <div class="figure-caption"><strong>Figure 3.</strong> Cohen's d and Glass's Δ for word count, average sentence length, and type-token ratio. Glass's Δ, using the human group standard deviation (n = 172) as denominator, is the preferred measure given substantial between-group variance inequality. Dotted lines indicate medium effect size thresholds (±0.5) per Cohen (1988).</div>
+  </div>
+</div>
+
+<!-- DISCUSSION -->
+<div id="discussion" class="section">
+  <div class="sec-heading">Discussion</div>
+  <p class="body-text">The present study investigated whether AI-generated responses exhibit lower linguistic variability than human-written responses when both groups respond to an identical open-ended prompt. Across all three primary metrics examined — word count, average sentence length, and type-token ratio — human-written responses demonstrated substantially greater distributional spread than AI-generated responses, with variance ratios ranging from 17.26 to 52.46. These findings are consistent with the hypothesis that AI-generated text occupies a narrower region of the linguistic metric space under controlled prompt conditions, and suggest that distributional compression may be a measurable and quantifiable property of large language model output.</p>
+  <p class="body-text">The most striking result was the variance ratio for word count (VR = 52.46), indicating that human responses were approximately 52 times more variable in length than AI-generated responses. Human word counts ranged from 3 to 229 words, reflecting the full spectrum of engagement. AI responses ranged from 61 to 83 words, clustering tightly around a narrow band regardless of which model produced them. This pattern is consistent with the architectural properties of large language models, which are trained to produce contextually appropriate, well-formed outputs and may therefore converge toward modal response lengths for a given prompt type.<cite-num>[1]</cite-num> It is important to note that this convergence does not indicate that AI responses are of lower quality — only that they are more uniform in length.</p>
+  <p class="body-text">The variance ratio for average sentence length (VR = 20.05) similarly indicated tighter structural consistency in AI-generated responses. Human sentence lengths ranged from 3 to 61 words per sentence on average, while AI responses maintained average sentence lengths within a narrow band of 15 to 28 words across all five models — a convergence that warrants further investigation in future work with larger, more systematically controlled model samples.</p>
+  <p class="body-text">The type-token ratio results introduced an important nuance. AI responses exhibited a higher mean TTR (M = 0.8945) than human responses (M = 0.8398), despite being longer on average. TTR is known to be sensitive to text length, and without length-normalised alternatives such as MATTR or MTLD, direct TTR comparisons between groups of differing mean length remain potentially confounded.<cite-num>[2]</cite-num> What the TTR variance ratio (VR = 17.26) does indicate reliably is that AI responses were considerably more consistent in their lexical diversity scores than human responses — human TTR ranged from 0.60 to 1.00, while AI TTR was constrained to 0.85 to 0.94.</p>
+  <p class="body-text">Glass's delta indicated medium-sized mean differences for word count (Δ = +0.54) and type-token ratio (Δ = +0.47), while average sentence length showed a negligible mean difference (Δ = −0.15). The central tendency of sentence length was similar between groups, but the variance around that central tendency was not — a distinction that mean-focused analyses alone would have missed entirely.</p>
+  <p class="body-text">Several factors may have influenced these results. The human response pool was collected via a self-distributed Google Form, introducing selection bias. AI responses were generated across five models without systematic control for temperature parameters — some portion of the observed variance differences may reflect parameter differences rather than fundamental properties of AI-generated text. All findings are conditional on a single open-ended prompt and should not be generalised beyond the prompt conditions studied here.</p>
+  <p class="body-text">Future work should employ larger and more diverse model samples, apply length-normalised lexical diversity measures, preserve raw response-level data to enable Levene's test and non-parametric inferential testing, and extend the prompt set to include multiple domains. Semantic-level analysis — examining whether AI responses also converge in meaning and ideational content — would represent a meaningful extension of this framework.</p>
+  <p class="body-text">In summary, this study demonstrated that AI-generated responses exhibited measurably lower linguistic variability than human-written responses across multiple quantitative metrics. Variance ratios of 52.46, 20.05, and 17.26 indicate that this difference is not marginal. These findings do not support claims about AI creativity or quality, but they do suggest that distributional uniformity is a quantifiable and potentially consistent characteristic of large language model output.</p>
+</div>
+
+<!-- METHODS -->
+<div id="methods" class="section">
+  <div class="sec-heading">Materials &amp; Methods</div>
+
+  <div class="sub-heading">Participants and Data Collection</div>
+  <p class="body-text">Human responses were collected via a Google Form distributed over a two-week period through social media platforms and peer networks. The form presented respondents with a single open-ended prompt — <em>"Propose a unique solution to loneliness in modern cities"</em> — and provided an unrestricted text field for responses. No length or formatting guidelines were provided. A total of 172 usable human responses were retained following preprocessing. All responses were in English.</p>
+  <p class="body-text">AI-generated responses were produced using five large language models accessed through their standard web interfaces: ChatGPT (OpenAI), Claude (Anthropic), Gemini (Google), Grok (xAI), and Perplexity. All models were queried under default generation settings without modification of temperature or other parameters. To minimise the influence of personalisation, no accounts were logged into during response generation. Each model generated 30 responses to the identical prompt, yielding 150 AI-generated responses in total.</p>
+
+  <div class="sub-heading">Preprocessing</div>
+  <p class="body-text">All responses underwent a standardised cleaning procedure prior to analysis. Human responses were excluded if they contained inappropriate, sexual, or evidently non-serious content; constituted verbatim or near-verbatim duplicates; or failed to address the prompt in any meaningful way. AI responses were similarly reviewed for prompt alignment and duplication. Following preprocessing, the final dataset comprised 172 human responses and 150 AI-generated responses.</p>
+
+  <div class="sub-heading">Metric Computation</div>
+  <p class="body-text">Five linguistic metrics were computed for each response: word count, unique word count, type-token ratio (TTR), sentence count, and average sentence length. Prior to computation, all responses were normalised by converting text to lowercase and removing punctuation. TTR was calculated as the ratio of unique word count to total word count. Average sentence length was computed by dividing total word count by sentence count. Metrics were calculated using Microsoft Excel and Google Colab. To verify computational accuracy, a random sample of 20 responses was manually evaluated and cross-checked against computed values.</p>
+
+  <div class="sub-heading">Statistical Analysis</div>
+  <p class="body-text">This study presents a descriptive quantitative analysis employing variance ratios, F-tests for equality of variances, and standardised effect sizes as primary quantitative evidence. Variance ratios were computed as σ²_human ÷ σ²_AI for each metric. F-tests were conducted using group-level summary statistics with degrees of freedom df₁ = 171 and df₂ = 149. Both Cohen's d and Glass's delta were computed as effect size measures; Glass's delta was treated as the preferred measure given substantial inequality in group standard deviations. Inferential testing at the response level could not be conducted due to the absence of preserved raw response-level data; findings are therefore interpreted as preliminary and hypothesis-generating. Figures were produced in Google Colab using the matplotlib and NumPy libraries.</p>
+</div>
+
+<!-- ANALYSER -->
+<div id="analyser" class="section">
+  <div class="sec-heading">Live Text Analyser</div>
+  <p class="body-text">Paste any text below to compute the same linguistic metrics used in this study. Your results are compared against the human and AI group statistics from the paper.</p>
+  <div class="analyser-wrap">
+    <textarea id="inputText" placeholder="Paste any text here — try a response to 'Propose a unique solution to loneliness in modern cities'..."></textarea>
+    <button class="run-btn" onclick="analyseText()">Analyse text →</button>
+    <div id="analyserResults" style="display:none">
+      <div class="results-grid">
+        <div class="res-card"><div class="res-val" id="r-wc">—</div><div class="res-label">Word count</div><div id="b-wc"></div></div>
+        <div class="res-card"><div class="res-val" id="r-sl">—</div><div class="res-label">Avg sent. length</div><div id="b-sl"></div></div>
+        <div class="res-card"><div class="res-val" id="r-ttr">—</div><div class="res-label">Type-token ratio</div><div id="b-ttr"></div></div>
+      </div>
+      <div class="results-grid" style="margin-top:1px">
+        <div class="res-card"><div class="res-val" id="r-uwc">—</div><div class="res-label">Unique words</div></div>
+        <div class="res-card"><div class="res-val" id="r-sc">—</div><div class="res-label">Sentence count</div></div>
+        <div class="res-card" style="background:var(--paper-dark)"><div class="res-val" style="font-size:13px;color:var(--ink-faint);margin-top:6px;line-height:1.7">Human avg WC: 51.5<br>AI avg WC: 77.4<br>Human TTR: 0.840<br>AI TTR: 0.895</div><div class="res-label">Reference</div></div>
+      </div>
+      <div class="hint-text" id="hint-text"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APPENDIX -->
+<div id="appendix" class="section">
+  <div class="sec-heading">Appendix A: Figure Generation Code</div>
+  <p class="body-text">The following Python code was used to generate Figures 1, 2, and 3 in Google Colab.</p>
+
+  <div class="sub-heading">Figure 1: Variance Ratio Bar Chart</div>
+  <div class="code-block">import matplotlib.pyplot as plt
+import numpy as np
+
+metrics = ['Word Count', 'Avg Sentence\nLength', 'TTR']
+vr = [52.46, 20.05, 17.26]
+
+fig, ax = plt.subplots(figsize=(7, 4))
+bars = ax.bar(metrics, vr, color=['#4C72B0'], width=0.5, edgecolor='black', linewidth=0.7)
+ax.axhline(y=1, color='red', linestyle='--', linewidth=1, label='VR = 1 (equal variance)')
+ax.set_ylabel('Variance Ratio (σ²_human / σ²_AI)', fontsize=11)
+ax.set_title('Variance Ratios: Human vs. AI Linguistic Metrics', fontsize=12)
+ax.legend(fontsize=9)
+for bar, val in zip(bars, vr):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
+            f'{val:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+plt.tight_layout()
+plt.savefig('figure1_variance_ratios.png', dpi=300)
+plt.show()</div>
+
+  <div class="sub-heading">Figure 2: Mean ± SD Error Bar Plot</div>
+  <div class="code-block">metrics_labels = ['Word Count', 'Avg Sentence Length', 'TTR']
+human_means = [51.52, 21.90, 0.8398]
+human_sds   = [47.72, 14.77, 0.1175]
+ai_means    = [77.40, 19.63, 0.8945]
+ai_sds      = [6.59,  3.27,  0.0283]
+x = np.arange(len(metrics_labels))
+width = 0.3
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.bar(x - width/2, human_means, width, yerr=human_sds, label='Human',
+       color='#4C72B0', alpha=0.85, capsize=5, edgecolor='black', linewidth=0.6)
+ax.bar(x + width/2, ai_means, width, yerr=ai_sds, label='AI',
+       color='#DD8452', alpha=0.85, capsize=5, edgecolor='black', linewidth=0.6)
+ax.set_xticks(x)
+ax.set_xticklabels(metrics_labels, fontsize=11)
+ax.set_ylabel('Metric Value', fontsize=11)
+ax.set_title('Mean ± SD of Linguistic Metrics: Human vs. AI Responses', fontsize=12)
+ax.legend(fontsize=10)
+plt.tight_layout()
+plt.savefig('figure2_mean_sd.png', dpi=300)
+plt.show()</div>
+
+  <div class="sub-heading">Figure 3: Effect Size Comparison Chart</div>
+  <div class="code-block">metric_names = ['Word Count', 'Avg Sentence Length', 'TTR']
+cohens_d  = [-0.76, 0.21, -0.64]
+glass_d   = [0.54, -0.15, 0.47]
+x = np.arange(len(metric_names))
+width = 0.3
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.bar(x - width/2, cohens_d, width, label="Cohen's d",
+       color='#4C72B0', edgecolor='black', linewidth=0.6)
+ax.bar(x + width/2, glass_d, width, label="Glass's Δ",
+       color='#DD8452', edgecolor='black', linewidth=0.6)
+ax.axhline(0, color='black', linewidth=0.8)
+ax.axhline(0.5, color='grey', linestyle=':', linewidth=0.8, label='Medium effect (±0.5)')
+ax.axhline(-0.5, color='grey', linestyle=':', linewidth=0.8)
+ax.set_xticks(x)
+ax.set_xticklabels(metric_names, fontsize=11)
+ax.set_ylabel('Effect Size', fontsize=11)
+ax.set_title("Effect Sizes for Mean Differences: Human vs. AI", fontsize=12)
+ax.legend(fontsize=9)
+plt.tight_layout()
+plt.savefig('figure3_effect_sizes.png', dpi=300)
+plt.show()</div>
+</div>
+
+<footer class="site-footer">
+  Independent Research · 2025 ·
+  <a href="https://aditisahay.vercel.app" target="_blank">aditisahay.vercel.app</a>
+</footer>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'results') setTimeout(drawCharts, 60);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+let chartsDrawn = false;
+function drawCharts() {
+  if (chartsDrawn) return;
+  chartsDrawn = true;
+  const INK = '#1a1714', FAINT = '#8a8078', RULE = 'rgba(200,191,176,0.4)';
+  const BLUE = '#4a6fa5', ORANGE = '#c47b3a';
+
+  new Chart(document.getElementById('fig2'), {
+    type: 'bar',
+    data: {
+      labels: ['Word count', 'Avg sentence length', 'TTR × 100'],
+      datasets: [
+        { label: 'Human', data: [51.52, 21.90, 83.98], backgroundColor: BLUE, borderWidth: 0 },
+        { label: 'AI', data: [77.40, 19.63, 89.45], backgroundColor: ORANGE, borderWidth: 0 }
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { labels: { color: INK, font: { family: 'DM Mono', size: 10 } } } }, scales: { y: { ticks: { color: FAINT, font: { family: 'DM Mono', size: 10 } }, grid: { color: RULE } }, x: { ticks: { color: FAINT, font: { family: 'DM Mono', size: 10 } }, grid: { display: false } } } }
+  });
+
+  new Chart(document.getElementById('fig1'), {
+    type: 'bar',
+    data: { labels: ['Word count', 'Avg sentence length', 'TTR'], datasets: [{ data: [52.46, 20.05, 17.26], backgroundColor: INK, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Variance ratio (VR)', color: FAINT, font: { family: 'DM Mono', size: 10 } }, ticks: { color: FAINT, font: { family: 'DM Mono', size: 10 } }, grid: { color: RULE } }, x: { ticks: { color: FAINT, font: { family: 'DM Mono', size: 10 } }, grid: { display: false } } } }
+  });
+
+  new Chart(document.getElementById('fig3'), {
+    type: 'bar',
+    data: { labels: ['Word count', 'Avg sentence length', 'TTR'], datasets: [{ label: "Cohen's d", data: [-0.76, 0.21, -0.64], backgroundColor: BLUE, borderWidth: 0 }, { label: "Glass's Δ", data: [0.54, -0.15, 0.47], backgroundColor: ORANGE, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { labels: { color: INK, font: { family: 'DM Mono', size: 10 } } } }, scales: { y: { ticks: { color: FAINT, font: { family: 'DM Mono', size: 10 } }, grid: { color: RULE } }, x: { ticks: { color: FAINT, font: { family: 'DM Mono', size: 10 } }, grid: { display: false } } } }
+  });
+}
+
+function analyseText() {
+  const text = document.getElementById('inputText').value.trim();
+  if (!text) return;
+  const clean = text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+  const words = clean.split(/\s+/).filter(w => w.length > 0);
+  const wc = words.length;
+  const unique = new Set(words).size;
+  const ttr = wc > 0 ? (unique / wc) : 0;
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const sc = sentences.length || 1;
+  const asl = parseFloat((wc / sc).toFixed(1));
+
+  document.getElementById('r-wc').textContent = wc;
+  document.getElementById('r-sl').textContent = asl;
+  document.getElementById('r-ttr').textContent = ttr.toFixed(3);
+  document.getElementById('r-uwc').textContent = unique;
+  document.getElementById('r-sc').textContent = sc;
+
+  function badge(val, hM, aiM, id) {
+    const dH = Math.abs(val - hM), dA = Math.abs(val - aiM);
+    let cls, label;
+    if (dH < dA) { cls = 'badge-human'; label = 'Closer to human avg'; }
+    else if (dA < dH) { cls = 'badge-ai'; label = 'Closer to AI avg'; }
+    else { cls = 'badge-mid'; label = 'Between both'; }
+    document.getElementById(id).innerHTML = `<span class="badge ${cls}">${label}</span>`;
+  }
+  badge(wc, 51.52, 77.40, 'b-wc');
+  badge(asl, 21.90, 19.63, 'b-sl');
+  badge(ttr, 0.8398, 0.8945, 'b-ttr');
+
+  const hints = [];
+  if (wc < 30) hints.push('Your response is shorter than most human responses in this study (range: 3–229 words).');
+  if (wc > 83) hints.push('Your response is longer than the AI ceiling observed in this study (max: 83 words).');
+  if (ttr > 0.94) hints.push('Your TTR exceeds the AI ceiling observed in this study (0.94).');
+  if (ttr < 0.60) hints.push('Your TTR falls below the human floor observed in this study (0.60).');
+  document.getElementById('hint-text').textContent = hints.join(' ');
+  document.getElementById('analyserResults').style.display = 'block';
+}
+</script>
+</body>
+</html>
