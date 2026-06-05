@@ -455,6 +455,30 @@ function analyseText() {
   document.getElementById('hint-text').textContent = hints.join(' ');
   document.getElementById('analyserResults').style.display = 'block';
 }
+
+  // disable right click
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// disable ctrl+u (view source), ctrl+s (save), ctrl+shift+i (devtools)
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.key === 'u') ||
+    (e.ctrlKey && e.key === 's') ||
+    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+    (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+    (e.ctrlKey && e.shiftKey && e.key === 'C')
+  ) {
+    e.preventDefault();
+  }
+});
+
+// disable text selection
+document.addEventListener('selectstart', e => e.preventDefault());
+
+// disable drag
+document.addEventListener('dragstart', e => e.preventDefault());
+  
 </script>
 </body>
 </html>
